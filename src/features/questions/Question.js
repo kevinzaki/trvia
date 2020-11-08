@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   currentRound,
@@ -6,19 +6,25 @@ import {
   numberOfRounds,
   categories
 } from "../game/gameSlice";
-import { setQuestion, currentQuestion } from "./questionsSlice";
+import {
+  setQuestion,
+  currentQuestion,
+  setCorrectAnswer,
+  correctAns
+} from "./questionsSlice";
 import { useParams } from "react-router-dom";
 import { socket } from "../../api/socket";
+
 export default function Question() {
+  const { id } = useParams();
+
   const dispatch = useDispatch();
-  //const q = useSelector(state => state.questions.question);
-  const status = useSelector(state => state.questions.status);
-  const numOfQuestions = useSelector(currentRound);
   const questionPerRound = useSelector(numberOfQuestionsPerRound);
   const numOfRounds = useSelector(numberOfRounds);
   const categoryIds = useSelector(categories);
   const question = useSelector(currentQuestion);
-  const { id } = useParams();
+
+  const [timer, setTimer] = useState(-1);
 
   useEffect(() => {
     socket.emit(
@@ -33,25 +39,73 @@ export default function Question() {
         socket.emit("getQuestion", { roomId: id });
       }
     );
+    return () => socket.disconnect();
   }, []);
 
   useEffect(() => {
     socket.on("question", q => {
       dispatch(setQuestion(q));
-      console.log(q);
+      setTimer(10);
     });
-  });
+
+    socket.on("correctAnswer", data => {
+      console.log(data);
+      dispatch(setCorrectAnswer(data));
+    });
+  }, []);
 
   // useEffect(() => {
-  //   if (status === "idle") {
-  //     dispatch(fetchQuestions({ numOfQuestions, categoryId }));
+  //   setTimeout(() => setTimer(30), 5000);
+  // }, []);
+  //const [timer, setTimer] = useState(0);
+
+  useInterval(() => {
+    if (timer > 0) setTimer(timer - 1);
+    else if (timer === 0) {
+      socket.emit("getCorrectAnswer", { roomId: id });
+      setTimer(-1);
+    }
+    // Your custom logic here
+    //setCount(timer - 1);
+  }, 1000);
+
+  // useEffect(() => {
+  //   let timeout;
+  //   if (timer > 0) setTimeout(() => setTimer(timer - 1), 1000);
+  //   else if (timer === 0) {
+  //     socket.emit("getCorrectAnswer", { roomId: id });
+  //     setTimer(-1);
   //   }
-  // }, [status, dispatch]);
+  //   return () => {
+  //     clearTimeout(timeout);
+  //   };
+  // }, [timer]);
 
   return (
     <div>
+      timer {timer}
       Question {id}
       {question !== null && <div>{question}</div>}
     </div>
   );
+}
+
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
+
+  // Remember the latest function.
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
 }

@@ -13,7 +13,8 @@ export const questionsSlice = createSlice({
   name: "questions",
   initialState: {
     question: null,
-    answers: []
+    answers: [],
+    correctAnswer: null
   },
   reducers: {
     setQuestion: (state, action) => {
@@ -21,13 +22,21 @@ export const questionsSlice = createSlice({
     },
     setAnswers: (state, action) => {
       state.answers = action.payload;
+    },
+    setCorrectAnswer: (state, action) => {
+      state.correctAnswer = action.payload;
     }
   }
 });
 
-export const { setQuestion, setAnswers } = questionsSlice.actions;
+export const {
+  setQuestion,
+  setAnswers,
+  setCorrectAnswer
+} = questionsSlice.actions;
 
 export const currentQuestion = state => state.questions.question;
 export const allAnswers = state => state.questions.answers;
+export const correctAns = state => state.question.correctAnswer;
 
 export default questionsSlice.reducer;

@@ -10,9 +10,9 @@ export default function CreateGame() {
   const dispatch = useDispatch();
   const idStatus = useSelector(state => state.game.status);
   const id = useSelector(gameId);
-  let location = useLocation();
+
   useEffect(() => {
-    if (idStatus === "idle") {
+    if (idStatus === "idle" && socket.connected) {
       dispatch(fetchGameId(socket.id.slice(-12)));
     }
   }, [idStatus, dispatch]);

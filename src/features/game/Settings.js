@@ -24,13 +24,16 @@ export default function Settings() {
   //const idStatus = useSelector(state => state.game.status);
 
   useEffect(() => {
-    if (id)
+    if (id) {
       socket.emit("createRoom", {
         id,
         numberOfRounds: numOfRounds,
         numberOfQuestionsPerRound: numOfQuestions,
         categoryIds: allCategories
       });
+    } else {
+      socket.connect();
+    }
   }, [id]);
 
   useEffect(() => {
@@ -38,14 +41,6 @@ export default function Settings() {
       console.log(data);
     });
   }, []);
-
-  //   useEffect(() => {
-  //     if (idStatus === "idle") {
-  //       dispatch(fetchGameId(socket.id));
-  //     }
-  //     //console.log(socket.id);
-  //     socket.emit("YASHIMASH");
-  //   }, [idStatus, dispatch]);
 
   useEffect(() => {
     if (categoryStatus === "idle") {
