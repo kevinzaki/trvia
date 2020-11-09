@@ -29,8 +29,9 @@ export const gameSlice = createSlice({
     selectedCategories: [],
     numberOfRounds: 3,
     numberOfQuestionsPerRound: 10,
-    currentRound: 12,
-    currentQuestion: 10
+    roundCount: 1,
+    questionCount: 1,
+    scores: []
     //timer: -1
   },
   reducers: {
@@ -42,6 +43,18 @@ export const gameSlice = createSlice({
     },
     updateSelectedCategories: (state, action) => {
       state.selectedCategories = action.payload;
+    },
+    incrementRound: (state, action) => {
+      state.roundCount += 1;
+    },
+    setQuestionCount: (state, action) => {
+      state.questionCount = action.payload;
+    },
+    incrementQuestion: (state, action) => {
+      state.questionCount += 1;
+    },
+    setScores: (state, action) => {
+      state.scores = [...action.payload];
     }
     // updateTimer: (state, action) => {
     //   state.timer = action.paylod;
@@ -65,17 +78,21 @@ export const gameSlice = createSlice({
 export const {
   setNumberOfRounds,
   setNumberOfQuestionsPerRound,
-  updateSelectedCategories
-  //updateTimer
+  updateSelectedCategories,
+  incrementQuestion,
+  incrementRound,
+  setScores,
+  setQuestionCount
 } = gameSlice.actions;
 
 export const numberOfQuestionsPerRound = state =>
   state.game.numberOfQuestionsPerRound;
 export const numberOfRounds = state => state.game.numberOfRounds;
-export const currentRound = state => state.game.currentRound;
-export const currentQuestion = state => state.game.currentQuestion;
+export const roundCount = state => state.game.roundCount;
+export const questionCount = state => state.game.questionCount;
 export const gameId = state => state.game.id;
 export const categories = state => state.game.selectedCategories;
+export const scores = state => state.game.scores;
 //export const timer = state => state.game.timer;
 
 export default gameSlice.reducer;

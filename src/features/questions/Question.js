@@ -1,19 +1,27 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  currentRound,
+  roundCount,
+  questionCount,
   numberOfQuestionsPerRound,
   numberOfRounds,
-  categories
+  categories,
+  incrementRound,
+  incrementQuestion,
+  setScores,
+  setQuestionCount
 } from "../game/gameSlice";
 import {
   setQuestion,
   currentQuestion,
   setCorrectAnswer,
-  correctAns
+  correctAns,
+  setAnswers
 } from "./questionsSlice";
 import { useParams } from "react-router-dom";
 import { socket } from "../../api/socket";
+import { Button } from "react-bootstrap";
+import Scores from "../scores/Scores";
 
 export default function Question() {
   const { id } = useParams();
@@ -23,6 +31,10 @@ export default function Question() {
   const numOfRounds = useSelector(numberOfRounds);
   const categoryIds = useSelector(categories);
   const question = useSelector(currentQuestion);
+  const answer = useSelector(correctAns);
+
+  const currRoundCount = useSelector(roundCount);
+  const currQuestionCount = useSelector(questionCount);
 
   const [timer, setTimer] = useState(-1);
 
@@ -49,15 +61,13 @@ export default function Question() {
     });
 
     socket.on("correctAnswer", data => {
-      console.log(data);
       dispatch(setCorrectAnswer(data));
     });
-  }, []);
 
-  // useEffect(() => {
-  //   setTimeout(() => setTimer(30), 5000);
-  // }, []);
-  //const [timer, setTimer] = useState(0);
+    socket.on("scores", scores => {
+      dispatch(setScores(scores.scores));
+    });
+  }, []);
 
   useInterval(() => {
     if (timer > 0) setTimer(timer - 1);
@@ -65,27 +75,46 @@ export default function Question() {
       socket.emit("getCorrectAnswer", { roomId: id });
       setTimer(-1);
     }
-    // Your custom logic here
-    //setCount(timer - 1);
   }, 1000);
 
-  // useEffect(() => {
-  //   let timeout;
-  //   if (timer > 0) setTimeout(() => setTimer(timer - 1), 1000);
-  //   else if (timer === 0) {
-  //     socket.emit("getCorrectAnswer", { roomId: id });
-  //     setTimer(-1);
-  //   }
-  //   return () => {
-  //     clearTimeout(timeout);
-  //   };
-  // }, [timer]);
+  function nextQuestion() {
+    dispatch(setCorrectAnswer(null));
+    dispatch(setQuestion(null));
+    dispatch(incrementQuestion());
+    // game is over
+    if (currRoundCount > numOfRounds) {
+      socket.emit("endGame", { roomId: id });
+    }
+    // round is over
+    else if (currQuestionCount >= questionPerRound) {
+      console.log(currQuestionCount + " " + questionPerRound);
+      dispatch(incrementRound());
+      socket.emit("getScores", { roomId: id });
+    }
+    // get next question
+    else {
+      socket.emit("getQuestion", { roomId: id });
+    }
+  }
+
+  function nextRount() {
+    dispatch(setQuestionCount(0));
+    nextQuestion();
+  }
 
   return (
     <div>
       timer {timer}
       Question {id}
       {question !== null && <div>{question}</div>}
+      {answer !== null && <div>{answer}</div>}
+      {answer !== null && <Button onClick={() => nextQuestion()}>Next</Button>}
+      {currQuestionCount > questionPerRound && <Scores />}
+      {currQuestionCount > questionPerRound &&
+        currRoundCount <= numOfRounds && (
+          <Button onClick={() => nextRount()}>Next Round</Button>
+        )}
+      {currRoundCount > numOfRounds && <Button>New Game</Button>}
     </div>
   );
 }

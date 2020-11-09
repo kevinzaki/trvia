@@ -15,32 +15,26 @@ import { socket } from "../../api/socket";
 
 export default function Settings() {
   const dispatch = useDispatch();
+
+  const id = useSelector(gameId);
   const numOfQuestions = useSelector(numberOfQuestionsPerRound);
   const numOfRounds = useSelector(numberOfRounds);
-  const id = useSelector(gameId);
-
   const allCategories = useSelector(categories);
   const categoryStatus = useSelector(state => state.categories.status);
   //const idStatus = useSelector(state => state.game.status);
 
-  useEffect(() => {
-    if (id) {
-      socket.emit("createRoom", {
-        id,
-        numberOfRounds: numOfRounds,
-        numberOfQuestionsPerRound: numOfQuestions,
-        categoryIds: allCategories
-      });
-    } else {
-      socket.connect();
-    }
-  }, [id]);
-
-  useEffect(() => {
-    socket.on("newPlayer", data => {
-      console.log(data);
-    });
-  }, []);
+  // useEffect(() => {
+  //   if (id) {
+  //     socket.emit("createRoom", {
+  //       id,
+  //       numberOfRounds: numOfRounds,
+  //       numberOfQuestionsPerRound: numOfQuestions,
+  //       categoryIds: allCategories
+  //     });
+  //   } else {
+  //     socket.connect();
+  //   }
+  // }, [id]);
 
   useEffect(() => {
     if (categoryStatus === "idle") {
@@ -85,7 +79,7 @@ export default function Settings() {
             }
             value={numOfQuestions}
           >
-            <option>5</option>
+            <option>2</option>
             <option>6</option>
             <option>7</option>
             <option>8</option>

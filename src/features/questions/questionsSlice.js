@@ -37,6 +37,6 @@ export const {
 
 export const currentQuestion = state => state.questions.question;
 export const allAnswers = state => state.questions.answers;
-export const correctAns = state => state.question.correctAnswer;
+export const correctAns = state => state.questions.correctAnswer;
 
 export default questionsSlice.reducer;
