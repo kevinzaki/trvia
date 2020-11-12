@@ -5,7 +5,8 @@ import { Table } from "react-bootstrap";
 
 export default function Scores() {
   const gameScores = useSelector(scores);
-
+  const roundOver = useSelector(state => state.game.isRoundOver);
+  if (!roundOver) return null;
   return (
     <div>
       <Table striped bordered hover variant="dark">

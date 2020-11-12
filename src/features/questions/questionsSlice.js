@@ -1,13 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-//import { getQuestions } from "../../api/client";
-
-// export const fetchQuestions = createAsyncThunk(
-//   "questions/fetchQuestions",
-//   async ({ numOfQuestions, categoryId }) => {
-//     const res = await getQuestions(numOfQuestions, categoryId);
-//     return res;
-//   }
-// );
 
 export const questionsSlice = createSlice({
   name: "questions",

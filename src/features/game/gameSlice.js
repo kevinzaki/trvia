@@ -31,6 +31,8 @@ export const gameSlice = createSlice({
     numberOfQuestionsPerRound: 10,
     roundCount: 1,
     questionCount: 1,
+    isRoundOver: false,
+    isGameOver: false,
     scores: []
     //timer: -1
   },
@@ -55,6 +57,12 @@ export const gameSlice = createSlice({
     },
     setScores: (state, action) => {
       state.scores = [...action.payload];
+    },
+    setIsRoundOver: (state, action) => {
+      state.isRoundOver = action.payload;
+    },
+    setIsGameOver: (state, action) => {
+      state.isGameOver = action.payload;
     }
     // updateTimer: (state, action) => {
     //   state.timer = action.paylod;
@@ -82,7 +90,9 @@ export const {
   incrementQuestion,
   incrementRound,
   setScores,
-  setQuestionCount
+  setQuestionCount,
+  setIsGameOver,
+  setIsRoundOver
 } = gameSlice.actions;
 
 export const numberOfQuestionsPerRound = state =>
