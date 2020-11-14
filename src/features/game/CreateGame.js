@@ -1,29 +1,20 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Container } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import QRCode from "qrcode.react";
 import Settings from "./Settings";
 import { socket } from "../../api/socket";
-import { useLocation } from "react-router-dom";
-import { fetchCategories, categories } from "../categories/categoriesSlice";
+import { categories } from "../categories/categoriesSlice";
+import "./createGame.css";
+import { fetchGameId, gameId, addPlayer } from "./gameSlice";
 
-import {
-  fetchGameId,
-  setNumberOfRounds,
-  setNumberOfQuestionsPerRound,
-  numberOfQuestionsPerRound,
-  numberOfRounds,
-  updateSelectedCategories,
-  gameId
-} from "./gameSlice";
 export default function CreateGame() {
   const dispatch = useDispatch();
+
   const idStatus = useSelector(state => state.game.status);
   const id = useSelector(gameId);
-
-  const numOfQuestions = useSelector(numberOfQuestionsPerRound);
-  const numOfRounds = useSelector(numberOfRounds);
   const allCategories = useSelector(categories);
+  const players = useSelector(state => state.game.players);
 
   useEffect(() => {
     if (idStatus === "idle" && socket.connected) {
@@ -35,26 +26,36 @@ export default function CreateGame() {
     if (id) {
       socket.emit("createRoom", {
         id,
-        numberOfRounds: numOfRounds,
-        numberOfQuestionsPerRound: numOfQuestions,
-        categoryIds: allCategories
+        roundSettings: []
       });
     } else {
       socket.connect();
-    } //
+    }
   }, [id]);
 
   useEffect(() => {
     socket.on("newPlayer", data => {
-      console.log(data);
+      dispatch(addPlayer(data));
     });
   }, []);
 
   return (
-    <Container>
-      {`localhost:3000/game/answers/${id}`}
-      {id && <QRCode value={`localhost:3000/game/answers/${id}`}></QRCode>}
-      <Settings />
-    </Container>
+    <div>
+      <div className="sidebar">
+        {id && <QRCode value={`localhost:3000/game/answers/${id}`}></QRCode>}
+        Players:{" "}
+        {
+          <ul>
+            {players.map(({ id, name }) => (
+              <li key={id}>{name}</li>
+            ))}
+          </ul>
+        }
+      </div>
+      <div className="main">
+        {`localhost:3000/game/answers/${id}`}
+        <Settings />
+      </div>
+    </div>
   );
 }

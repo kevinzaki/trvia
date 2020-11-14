@@ -3,9 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   roundCount,
   questionCount,
-  numberOfQuestionsPerRound,
-  numberOfRounds,
-  categories,
   incrementRound,
   incrementQuestion,
   setScores,
@@ -17,8 +14,7 @@ import {
   setQuestion,
   currentQuestion,
   setCorrectAnswer,
-  correctAns,
-  setAnswers
+  correctAns
 } from "./questionsSlice";
 import { useParams, useHistory } from "react-router-dom";
 import { socket } from "../../api/socket";
@@ -31,35 +27,31 @@ import ActionButton from "./ActionButton";
 
 export default function Question() {
   const { id } = useParams();
-
   const dispatch = useDispatch();
-  const questionPerRound = useSelector(numberOfQuestionsPerRound);
-  const numOfRounds = useSelector(numberOfRounds);
-  const categoryIds = useSelector(categories);
-  const question = useSelector(currentQuestion);
-  const answer = useSelector(correctAns);
+  const history = useHistory();
 
+  const roundSettings = useSelector(state => state.game.roundSettings);
   const currRoundCount = useSelector(roundCount);
   const currQuestionCount = useSelector(questionCount);
 
   const [timer, setTimer] = useState(-1);
-
   const [showScores, setShowScores] = useState(false);
 
-  let history = useHistory();
+  const rounds = roundSettings.length;
 
   useEffect(() => {
     socket.emit("startGame", {
       roomId: id,
-      numberOfRounds: numOfRounds,
-      numberOfQuestionsPerRound: questionPerRound,
-      categoryIds
+      roundSettings
     });
+
     return () => socket.disconnect();
   }, []);
 
   useEffect(() => {
-    socket.on("gameStarted", () => socket.emit("getQuestion", { roomId: id }));
+    socket.on("gameStarted", () =>
+      socket.emit("getQuestion", { roomId: id, round: currRoundCount })
+    );
 
     socket.on("question", q => {
       dispatch(setQuestion(q));
@@ -88,14 +80,17 @@ export default function Question() {
     dispatch(setCorrectAnswer(null));
     dispatch(setQuestion(null));
 
-    if (currRoundCount > numOfRounds) {
+    if (currRoundCount > rounds) {
       dispatch(setIsGameOver(true));
       socket.emit("endGame", { roomId: id });
-    } else if (currQuestionCount > questionPerRound) {
+    } else if (
+      currQuestionCount > roundSettings[currRoundCount - 1].numOfQuestions
+    ) {
       dispatch(setIsRoundOver(true));
       socket.emit("getScores", { roomId: id });
     } else {
-      socket.emit("getQuestion", { roomId: id });
+      console.log("here");
+      socket.emit("getQuestion", { roomId: id, round: currRoundCount });
     }
   }, [currRoundCount, currQuestionCount]);
 

@@ -3,18 +3,19 @@ import { useSelector } from "react-redux";
 import { Button } from "react-bootstrap";
 
 export default function ActionButton({ onQuestion, onRound, onGame }) {
+  const settings = useSelector(state => state.game.roundSettings);
   const gameOver = useSelector(state => state.game.isGameOver);
   const roundOver = useSelector(state => state.game.isRoundOver);
-  const qPerRound = useSelector(state => state.game.numberOfQuestionsPerRound);
+  const roundId = useSelector(state => state.game.roundCount);
+  const numOfQuestions = settings[roundId - 1].numOfQuestions;
   const qCount = useSelector(state => state.game.questionCount);
-  const rPerGame = useSelector(state => state.game.numberOfRounds);
-  const rCount = useSelector(state => state.game.roundCount);
+  const roundsPerGame = settings.length;
   const correctAns = useSelector(state => state.questions.correctAnswer);
 
   if (!gameOver && !roundOver && correctAns) {
     return (
       <Button onClick={() => onQuestion()}>
-        {qPerRound === qCount ? "End Round" : "Next Question"}
+        {numOfQuestions === qCount ? "End Round" : "Next Question"}
       </Button>
     );
   }
@@ -24,7 +25,7 @@ export default function ActionButton({ onQuestion, onRound, onGame }) {
   if (roundOver) {
     return (
       <Button onClick={() => onRound()}>
-        {rPerGame === rCount ? "End Game" : "Next Round"}
+        {roundsPerGame === roundId ? "End Game" : "Next Round"}
       </Button>
     );
   }

@@ -1,109 +1,135 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
-import {
-  setNumberOfRounds,
-  setNumberOfQuestionsPerRound,
-  numberOfQuestionsPerRound,
-  numberOfRounds,
-  updateSelectedCategories,
-  gameId
-} from "./gameSlice";
+import { Link, useHistory } from "react-router-dom";
+import { gameId, updateRoundSettings } from "./gameSlice";
 import { fetchCategories, categories } from "../categories/categoriesSlice";
-import { Container, Form, Button } from "react-bootstrap";
-import { socket } from "../../api/socket";
+import { Container, Form, Button, Table } from "react-bootstrap";
 
 export default function Settings() {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const id = useSelector(gameId);
-  const numOfQuestions = useSelector(numberOfQuestionsPerRound);
-  const numOfRounds = useSelector(numberOfRounds);
   const allCategories = useSelector(categories);
   const categoryStatus = useSelector(state => state.categories.status);
-  //const idStatus = useSelector(state => state.game.status);
 
-  // useEffect(() => {
-  //   if (id) {
-  //     socket.emit("createRoom", {
-  //       id,
-  //       numberOfRounds: numOfRounds,
-  //       numberOfQuestionsPerRound: numOfQuestions,
-  //       categoryIds: allCategories
-  //     });
-  //   } else {
-  //     socket.connect();
-  //   }
-  // }, [id]);
+  const [roundSettings, setRoundSettings] = useState([]);
 
   useEffect(() => {
     if (categoryStatus === "idle") {
       dispatch(fetchCategories());
     }
+    if (categoryStatus === "succeeded") {
+      addRow();
+    }
   }, [categoryStatus, dispatch]);
 
-  const selectedCategories = arr => {
-    const selectedIds = Array.from(arr).map(item => parseInt(item.id));
-    console.log(selectedIds);
-    dispatch(updateSelectedCategories(selectedIds));
+  const updateSettingsField = (index, propertyName) => e => {
+    const settings = [...roundSettings];
+    settings[index][propertyName] = parseInt(e.target.value);
+    setRoundSettings(settings);
   };
+
+  const addRow = () => {
+    setRoundSettings([
+      ...roundSettings,
+      {
+        round: roundSettings.length + 1,
+        numOfQuestions: 5,
+        timer: 30,
+        category: allCategories[0].id
+      }
+    ]);
+  };
+
+  const startGame = () => {
+    dispatch(updateRoundSettings(roundSettings));
+    history.push(`/game/question/${id}`);
+  };
+
+  const allowedRoundCounts = [1, 2, 3, 4, 5];
+  const allowedTimes = [15, 30, 45, 60];
 
   return (
     <Container>
       <Link to={`/game/question/${id}`}>
         <Button>Start Game</Button>
       </Link>
-      <Form>
-        <Form.Group>
-          <Form.Label>Number Of Rounds</Form.Label>
-          <Form.Control
-            as="select"
-            onChange={e =>
-              dispatch(setNumberOfRounds(parseInt(e.target.value)))
-            }
-            value={numOfRounds}
-          >
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
-          </Form.Control>
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Number Of Questions Per Round</Form.Label>
-          <Form.Control
-            as="select"
-            onChange={e =>
-              dispatch(setNumberOfQuestionsPerRound(parseInt(e.target.value)))
-            }
-            value={numOfQuestions}
-          >
-            <option>2</option>
-            <option>6</option>
-            <option>7</option>
-            <option>8</option>
-            <option>9</option>
-            <option>10</option>
-          </Form.Control>
-        </Form.Group>
-        <Form.Group controlId="exampleForm.ControlSelect2">
-          <Form.Label>Example multiple select</Form.Label>
-          <Form.Control
-            as="select"
-            onChange={e => selectedCategories(e.target.selectedOptions)}
-            multiple
-          >
-            {allCategories.map(category => (
-              <option key={category.id} id={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </Form.Control>
-        </Form.Group>
-      </Form>
-      <div>numberOfQuestionsPerRound: {numOfQuestions}</div>
-      <div>numOfQuestions: {numOfRounds}</div>
+
+      <Table responsive>
+        <thead>
+          <tr>
+            <th>Round #</th>
+            <th># Of Questions</th>
+            <th>Timer</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+        <tbody>
+          {roundSettings.map(
+            ({ round, numOfQuestions, timer, category }, index) => (
+              <tr>
+                <td>{round}</td>
+                <td>
+                  <Form.Control
+                    as="select"
+                    onChange={updateSettingsField(index, "numOfQuestions")}
+                    value={numOfQuestions}
+                  >
+                    {allowedRoundCounts.map(val => (
+                      <option value={val}>{val}</option>
+                    ))}
+                  </Form.Control>
+                </td>
+                <td>
+                  <Form.Control
+                    as="select"
+                    onChange={updateSettingsField(index, "timer")}
+                    value={timer}
+                  >
+                    {allowedTimes.map(val => (
+                      <option value={val}>{val}</option>
+                    ))}
+                  </Form.Control>
+                </td>
+                <td>
+                  <Form.Control
+                    as="select"
+                    value={category}
+                    onChange={updateSettingsField(index, "category")}
+                  >
+                    {allCategories.map(category => (
+                      <option
+                        value={category.id}
+                        key={category.id}
+                        id={category.id}
+                      >
+                        {category.name}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </td>
+              </tr>
+            )
+          )}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colSpan="4">
+              <Button
+                onClick={() => addRow()}
+                variant="outline-secondary"
+                block
+              >
+                Add Round
+              </Button>
+            </th>
+          </tr>
+        </tfoot>
+      </Table>
+      <Button onClick={startGame} block>
+        Start Game
+      </Button>
     </Container>
   );
 }

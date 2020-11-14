@@ -4,21 +4,6 @@ export const fetchGameId = createAsyncThunk("game/fetchGameId", async id => {
   return id;
 });
 
-// export const setTimer = createAsyncThunk(
-//   "game/setTimer",
-//   async (time) => {
-//     const res = await setTimeout(() => dispatch(updateTimer(13)), 1000);
-//   }
-// )
-
-// export const fetchQuestions = createAsyncThunk(
-//   "questions/fetchQuestions",
-//   async ({ numOfQuestions, categoryId }) => {
-//     const res = await getQuestions(numOfQuestions, categoryId);
-//     return res;
-//   }
-// );
-
 export const gameSlice = createSlice({
   name: "game",
   initialState: {
@@ -26,9 +11,7 @@ export const gameSlice = createSlice({
     error: null,
     status: "idle",
     players: [],
-    selectedCategories: [],
-    numberOfRounds: 3,
-    numberOfQuestionsPerRound: 10,
+    roundSettings: [],
     roundCount: 1,
     questionCount: 1,
     isRoundOver: false,
@@ -37,15 +20,6 @@ export const gameSlice = createSlice({
     //timer: -1
   },
   reducers: {
-    setNumberOfRounds: (state, action) => {
-      state.numberOfRounds = action.payload;
-    },
-    setNumberOfQuestionsPerRound: (state, action) => {
-      state.numberOfQuestionsPerRound = action.payload;
-    },
-    updateSelectedCategories: (state, action) => {
-      state.selectedCategories = action.payload;
-    },
     incrementRound: (state, action) => {
       state.roundCount += 1;
     },
@@ -63,6 +37,12 @@ export const gameSlice = createSlice({
     },
     setIsGameOver: (state, action) => {
       state.isGameOver = action.payload;
+    },
+    addPlayer: (state, action) => {
+      state.players.push(action.payload);
+    },
+    updateRoundSettings: (state, action) => {
+      state.roundSettings = [...action.payload];
     }
     // updateTimer: (state, action) => {
     //   state.timer = action.paylod;
@@ -84,24 +64,19 @@ export const gameSlice = createSlice({
 });
 
 export const {
-  setNumberOfRounds,
-  setNumberOfQuestionsPerRound,
-  updateSelectedCategories,
   incrementQuestion,
   incrementRound,
   setScores,
   setQuestionCount,
   setIsGameOver,
-  setIsRoundOver
+  setIsRoundOver,
+  addPlayer,
+  updateRoundSettings
 } = gameSlice.actions;
 
-export const numberOfQuestionsPerRound = state =>
-  state.game.numberOfQuestionsPerRound;
-export const numberOfRounds = state => state.game.numberOfRounds;
 export const roundCount = state => state.game.roundCount;
 export const questionCount = state => state.game.questionCount;
 export const gameId = state => state.game.id;
-export const categories = state => state.game.selectedCategories;
 export const scores = state => state.game.scores;
 //export const timer = state => state.game.timer;
 
