@@ -1,15 +1,103 @@
-.sidebar {
-  height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 300px; /* Set the width of the sidebar */
-  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  z-index: 1; /* Stay on top */
-  top: 0; /* Stay at the top */
-  left: 0;
-  background-color: #efefef;
-  overflow-x: hidden; /* Disable horizontal scroll */
-  padding: 20px;
+.main-container {
+  padding: 0 !important;
+  /* padding-top: 5%; */
+  height: 100vh;
+}
+
+.left-container {
+  background: #232526; /* fallback for old browsers */
+  padding: 3em !important;
+  background: -webkit-linear-gradient(
+    to top,
+    #303133,
+    #232526
+  ); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(
+    to top,
+    #303133,
+    #232526
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  height: 100vh;
+  box-shadow: 2px 0px 28px -3px rgba(0, 0, 0, 0.46);
+  -webkit-box-shadow: 2px 0px 28px -3px rgba(0, 0, 0, 0.46);
+  -moz-box-shadow: 2px 0px 28px -3px rgba(0, 0, 0, 0.46);
+}
+
+.right-container {
+  background-image: linear-gradient(to top, #6a11cb 0%, #2575fc 100%);
+
+  padding: 3em !important;
 }
 
 .main {
-  margin-left: 300px;
+  margin-left: 30%;
+  height: 100%;
+}
+
+.qrcode {
+  margin: 0 auto;
+  display: block;
+  background-color: #fff;
+  padding: 1em;
+  border-radius: 1em;
+}
+
+.start-button {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #fff;
+  padding: 1em 2em;
+  background-color: #2575fc;
+  border: none;
+  border-radius: 1em;
+  text-align: center;
+  text-decoration: none;
+  font-size: 1em;
+  font-weight: 600;
+  transition-duration: 0.4s;
+  align-self: center;
+  width: 100%;
+  display: block;
+  box-shadow: 2px 0px 28px -3px rgba(0, 0, 0, 0.46);
+  -webkit-box-shadow: 2px 0px 28px -3px rgba(0, 0, 0, 0.46);
+  -moz-box-shadow: 2px 0px 28px -3px rgba(0, 0, 0, 0.46);
+}
+
+.start-button:hover {
+  background-color: #232526;
+}
+
+.player {
+  margin: 3em 0;
+}
+.connected-user-title {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 1.4em;
+  display: block;
+  border-radius: 1em;
+  padding: 0.5em 1em;
+  align-content: center;
+  margin-bottom: 1em;
+  color: #fff;
+  font-weight: bold;
+  margin-right: 1em;
+}
+.connected-user {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  display: inline-block;
+  border: 0.3em solid #2575fc;
+  border-radius: 1em;
+  padding: 0.5em 1em;
+  margin: 0 0.5em;
+  margin-bottom: 1em;
+  color: #fff;
+  font-weight: bold;
+}
+
+h1 {
+  line-height: 2em !important;
+  text-shadow: -1px 1px 7px rgba(0, 0, 0, 0.5);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #fff;
+  font-weight: bold !important;
+  font-size: 1.5em !important;
 }

@@ -4,7 +4,9 @@ import { useParams } from "react-router-dom";
 import { fetchGameId, gameId } from "../game/gameSlice";
 import { setAnswers, allAnswers } from "./questionsSlice";
 import { socket } from "../../api/socket";
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, Container } from "react-bootstrap";
+import Option from "./Option";
+import "./answers.css";
 
 export default function Answers() {
   const [name, setName] = useState("");
@@ -53,55 +55,50 @@ export default function Answers() {
   }
 
   return (
-    <>
+    <div className="answer-bg">
       {!joinedRoom && (
-        <Form>
-          <Form.Group controlId="formBasicEmail">
-            <Form.Label>Name</Form.Label>
-            <Form.Control
-              value={name}
-              onChange={e => setName(e.target.value)}
-              type="text"
-              placeholder="Enter name"
-            />
-            <Form.Text className="text-muted">
-              Your name will be displayed to other players.
-            </Form.Text>
-          </Form.Group>
-          <Button variant="primary" type="submit" onClick={() => joinRoom()}>
-            Join Game
-          </Button>
-        </Form>
+        <Container className="answers-container">
+          <h1 className="txt-center">Join Game</h1>
+          <Form>
+            <Form.Group controlId="formBasicEmail">
+              <Form.Control
+                className="answers-txt-box"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                type="text"
+                placeholder="Enter a Name or Alias"
+              />
+            </Form.Group>
+            <button
+              className="action-button"
+              type="submit"
+              onClick={() => joinRoom()}
+            >
+              SUBMIT
+            </button>
+          </Form>
+        </Container>
       )}
       {joinedRoom && (
-        <div>
-          {name} ANSWERS {id} {answers.length}
-          {answers.length &&
+        <Container className="answers-container">
+          {answers.length > 0 &&
             answers.map((answer, idx) => (
-              <Button
+              <Option
                 key={idx}
-                variant="outline-secondary"
-                size="lg"
-                block={true}
                 active={selectedAns === idx}
                 disabled={finalAnswer && selectedAns !== idx}
                 onClick={() => setSelectedAns(idx)}
               >
                 {answer}
-              </Button>
+              </Option>
             ))}
-          {answers.length && !finalAnswer && (
-            <Button
-              variant="primary"
-              size="lg"
-              block
-              onClick={() => submitAnswer()}
-            >
+          {answers.length > 0 && !finalAnswer && (
+            <button className="action-button" onClick={() => submitAnswer()}>
               Final Answer
-            </Button>
+            </button>
           )}
-        </div>
+        </Container>
       )}
-    </>
+    </div>
   );
 }

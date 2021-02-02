@@ -1,0 +1,51 @@
+.option-grid {
+  padding: 0 1em;
+  margin: 0 0 1em 0;
+  display: grid;
+  grid-template-columns: 5% 20% 20% auto 10%;
+  grid-gap: 1em;
+  border-radius: 1em;
+  background-color: rgba(255, 255, 255, 1);
+  box-shadow: 0px 2px 10px -5px rgba(0, 0, 0, 0.4);
+  -webkit-box-shadow: 0px 2px 10px -5px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0px 2px 10px -5px rgba(0, 0, 0, 0.4);
+}
+
+.option-grid-bg {
+  color: #fff;
+  background: #232526; /* fallback for old browsers */
+  background: -webkit-linear-gradient(
+    to top,
+    #303133,
+    #232526
+  ); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(
+    to top,
+    #303133,
+    #232526
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.option-grid > div {
+  text-align: center;
+  padding: 1em 0;
+  font-size: 1em;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: bold;
+}
+
+.option-item {
+  margin: auto 0;
+}
+
+.option-item-left {
+  text-align: left !important;
+  margin: auto 0;
+}
+
+.btn-width {
+  font-weight: bold !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: 2em !important;
+}

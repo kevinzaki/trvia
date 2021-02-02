@@ -1,32 +1,38 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Button } from "react-bootstrap";
+import "./question.css";
 
 export default function ActionButton({ onQuestion, onRound, onGame }) {
   const settings = useSelector(state => state.game.roundSettings);
   const gameOver = useSelector(state => state.game.isGameOver);
   const roundOver = useSelector(state => state.game.isRoundOver);
   const roundId = useSelector(state => state.game.roundCount);
-  const numOfQuestions = settings[roundId - 1].numOfQuestions;
+  const numOfQuestions =
+    settings.length > 0 ? settings[roundId - 1].numOfQuestions : 0;
   const qCount = useSelector(state => state.game.questionCount);
   const roundsPerGame = settings.length;
   const correctAns = useSelector(state => state.questions.correctAnswer);
 
   if (!gameOver && !roundOver && correctAns) {
     return (
-      <Button onClick={() => onQuestion()}>
+      <button className="q-action-button" onClick={() => onQuestion()}>
         {numOfQuestions === qCount ? "End Round" : "Next Question"}
-      </Button>
+      </button>
     );
   }
   if (gameOver) {
-    return <Button onClick={() => onGame()}>New Game</Button>;
+    return (
+      <button className="q-action-button" onClick={() => onGame()}>
+        New Game
+      </button>
+    );
   }
   if (roundOver) {
     return (
-      <Button onClick={() => onRound()}>
+      <button className="q-action-button" onClick={() => onRound()}>
         {roundsPerGame === roundId ? "End Game" : "Next Round"}
-      </Button>
+      </button>
     );
   }
   return null;

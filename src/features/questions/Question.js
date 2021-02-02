@@ -18,12 +18,16 @@ import {
 } from "./questionsSlice";
 import { useParams, useHistory } from "react-router-dom";
 import { socket } from "../../api/socket";
-import { Container, Button } from "react-bootstrap";
+import { Container, Button, Navbar } from "react-bootstrap";
 import Scores from "../scores/Scores";
 import { Link } from "react-router-dom";
 import SingleQuestion from "./SingleQuestion";
 import CorrectAnswer from "./CorrectAnswer";
 import ActionButton from "./ActionButton";
+import "./question.css";
+import StickyFooter from "./StickyFooter";
+import Timer from "./Timer";
+import QuestionNumber from "./QuestionNumber";
 
 export default function Question() {
   const { id } = useParams();
@@ -33,9 +37,11 @@ export default function Question() {
   const roundSettings = useSelector(state => state.game.roundSettings);
   const currRoundCount = useSelector(roundCount);
   const currQuestionCount = useSelector(questionCount);
+  const question = useSelector(currentQuestion);
 
   const [timer, setTimer] = useState(-1);
   const [showScores, setShowScores] = useState(false);
+  const [numOfQuestions, setNumOfQuestions] = useState(1);
 
   const rounds = roundSettings.length;
 
@@ -49,13 +55,21 @@ export default function Question() {
   }, []);
 
   useEffect(() => {
-    socket.on("gameStarted", () =>
-      socket.emit("getQuestion", { roomId: id, round: currRoundCount })
+    if (roundSettings.length)
+      setNumOfQuestions(roundSettings[currRoundCount - 1].numOfQuestions);
+  }, [currRoundCount]);
+
+  useEffect(() => {
+    socket.on(
+      "gameStarted",
+      () => dispatch(setQuestion(null))
+      //socket.emit("getQuestion", { roomId: id, round: currRoundCount })
     );
 
     socket.on("question", q => {
       dispatch(setQuestion(q));
-      setTimer(10);
+      console.log(roundSettings[currRoundCount - 1].timer);
+      setTimer(roundSettings[currRoundCount - 1].timer);
     });
 
     socket.on("correctAnswer", data => {
@@ -78,49 +92,49 @@ export default function Question() {
 
   useEffect(() => {
     dispatch(setCorrectAnswer(null));
-    dispatch(setQuestion(null));
+    if (question !== null) dispatch(setQuestion(null));
 
-    if (currRoundCount > rounds) {
-      dispatch(setIsGameOver(true));
-      socket.emit("endGame", { roomId: id });
-    } else if (
-      currQuestionCount > roundSettings[currRoundCount - 1].numOfQuestions
-    ) {
+    if (currQuestionCount > roundSettings[currRoundCount - 1].numOfQuestions) {
       dispatch(setIsRoundOver(true));
       socket.emit("getScores", { roomId: id });
     } else {
-      console.log("here");
       socket.emit("getQuestion", { roomId: id, round: currRoundCount });
     }
   }, [currRoundCount, currQuestionCount]);
 
-  function nextQuestion() {
+  const nextQuestion = () => {
     dispatch(incrementQuestion());
-  }
+  };
 
-  function nextRound() {
-    dispatch(incrementRound());
-    dispatch(setIsRoundOver(false));
-    dispatch(setQuestionCount(1));
-  }
+  const nextRound = () => {
+    if (currRoundCount === rounds) {
+      endGame();
+    } else {
+      dispatch(incrementRound());
+      dispatch(setIsRoundOver(false));
+      dispatch(setQuestionCount(1));
+    }
+  };
 
-  function endGame() {
-    // reset game ID later
-    history.push("/create");
-  }
+  const endGame = () => {
+    socket.emit("endGame", { roomId: id });
+    history.push("/");
+  };
 
   return (
-    <Container>
-      timer {timer}
-      Question {id}
+    <Container className="question-bg" fluid>
+      <Timer
+        currTime={timer}
+        maxTime={roundSettings[currRoundCount - 1].timer}
+      />
+      <QuestionNumber
+        currQuestion={currQuestionCount}
+        numOfQuestions={numOfQuestions}
+      />
       <SingleQuestion />
       <CorrectAnswer />
       <Scores />
-      <ActionButton
-        onQuestion={nextQuestion}
-        onRound={nextRound}
-        onGame={endGame}
-      />
+      <ActionButton onQuestion={nextQuestion} onRound={nextRound} />
     </Container>
   );
 }

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { gameId, updateRoundSettings } from "./gameSlice";
 import { fetchCategories, categories } from "../categories/categoriesSlice";
-import { Container, Form, Button, Table } from "react-bootstrap";
+import { Form, Button } from "react-bootstrap";
+import "./settingsOption.css";
 
 export default function Settings() {
   const dispatch = useDispatch();
@@ -30,6 +31,12 @@ export default function Settings() {
     setRoundSettings(settings);
   };
 
+  const deleteRound = index => {
+    const settings = [...roundSettings].filter((curr, idx) => idx !== index);
+    settings.forEach((curr, idx) => (curr.round = idx + 1));
+    setRoundSettings(settings);
+  };
+
   const addRow = () => {
     setRoundSettings([
       ...roundSettings,
@@ -51,85 +58,87 @@ export default function Settings() {
   const allowedTimes = [15, 30, 45, 60];
 
   return (
-    <Container>
-      <Link to={`/game/question/${id}`}>
-        <Button>Start Game</Button>
-      </Link>
-
-      <Table responsive>
-        <thead>
-          <tr>
-            <th>Round #</th>
-            <th># Of Questions</th>
-            <th>Timer</th>
-            <th>Category</th>
-          </tr>
-        </thead>
-        <tbody>
-          {roundSettings.map(
-            ({ round, numOfQuestions, timer, category }, index) => (
-              <tr>
-                <td>{round}</td>
-                <td>
-                  <Form.Control
-                    as="select"
-                    onChange={updateSettingsField(index, "numOfQuestions")}
-                    value={numOfQuestions}
-                  >
-                    {allowedRoundCounts.map(val => (
-                      <option value={val}>{val}</option>
-                    ))}
-                  </Form.Control>
-                </td>
-                <td>
-                  <Form.Control
-                    as="select"
-                    onChange={updateSettingsField(index, "timer")}
-                    value={timer}
-                  >
-                    {allowedTimes.map(val => (
-                      <option value={val}>{val}</option>
-                    ))}
-                  </Form.Control>
-                </td>
-                <td>
-                  <Form.Control
-                    as="select"
-                    value={category}
-                    onChange={updateSettingsField(index, "category")}
-                  >
-                    {allCategories.map(category => (
-                      <option
-                        value={category.id}
-                        key={category.id}
-                        id={category.id}
-                      >
-                        {category.name}
-                      </option>
-                    ))}
-                  </Form.Control>
-                </td>
-              </tr>
-            )
-          )}
-        </tbody>
-        <tfoot>
-          <tr>
-            <th colSpan="4">
-              <Button
-                onClick={() => addRow()}
-                variant="outline-secondary"
-                block
+    <div>
+      <div className="option-grid option-grid-bg">
+        <div className="option-item">#</div>
+        <div className="option-item-left">Questions</div>
+        <div className="option-item-left">Timer</div>
+        <div className="option-item-left">Category</div>
+        <div className="option-item">
+          <Button
+            className="btn-width"
+            size="sm"
+            onClick={() => addRow()}
+            variant="success"
+          >
+            +
+          </Button>
+        </div>
+      </div>
+      {roundSettings.map(
+        ({ round, numOfQuestions, timer, category }, index) => (
+          <div key={round} className="option-grid">
+            <div className="option-item">{round}</div>
+            <div className="option-item">
+              <Form.Control
+                as="select"
+                onChange={updateSettingsField(index, "numOfQuestions")}
+                value={numOfQuestions}
               >
-                Add Round
+                {allowedRoundCounts.map((val, idx) => (
+                  <option key={`round${idx}`} value={val}>
+                    {val}
+                  </option>
+                ))}
+              </Form.Control>
+            </div>
+            <div className="option-item">
+              <Form.Control
+                as="select"
+                onChange={updateSettingsField(index, "timer")}
+                value={timer}
+              >
+                {allowedTimes.map((val, idx) => (
+                  <option key={`time${idx}`} value={val}>
+                    {val}
+                  </option>
+                ))}
+              </Form.Control>
+            </div>
+            <div className="option-item">
+              <Form.Control
+                as="select"
+                value={category}
+                onChange={updateSettingsField(index, "category")}
+              >
+                {allCategories.map(category => (
+                  <option
+                    value={category.id}
+                    key={category.id}
+                    id={category.id}
+                  >
+                    {category.name}
+                  </option>
+                ))}
+              </Form.Control>
+            </div>
+            <div className="option-item">
+              <Button
+                className="btn-width"
+                size="sm"
+                onClick={() => deleteRound(index)}
+                variant="danger"
+                disabled={roundSettings.length === 1 ? true : false}
+              >
+                -
               </Button>
-            </th>
-          </tr>
-        </tfoot>
-      </Table>
-      <Button onClick={startGame} block>
+            </div>
+          </div>
+        )
+      )}
+      <button className="start-button btn-grad " onClick={startGame}>
         Start Game
-      </Button>
-    </Container>
+      </button>
+    </div>
   );
 }

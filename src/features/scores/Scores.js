@@ -1,15 +1,16 @@
 import React from "react";
 import { scores } from "../game/gameSlice";
 import { useSelector } from "react-redux";
-import { Table } from "react-bootstrap";
+import { Table, Container } from "react-bootstrap";
+import "./scoreboard.css";
 
 export default function Scores() {
   const gameScores = useSelector(scores);
   const roundOver = useSelector(state => state.game.isRoundOver);
   if (!roundOver) return null;
   return (
-    <div>
-      <Table striped bordered hover variant="dark">
+    <Container className="scoreboard">
+      <Table striped bordered hover variant="light">
         <thead>
           <tr>
             <th>Place</th>
@@ -27,6 +28,6 @@ export default function Scores() {
           ))}
         </tbody>
       </Table>
-    </div>
+    </Container>
   );
 }
