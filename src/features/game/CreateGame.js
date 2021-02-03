@@ -80,7 +80,7 @@ export default function CreateGame() {
               className="qrcode"
               size={QRCodeWidth}
               fgColor="#1a1a1a"
-              value={`localhost:3000/game/answers/${id}`}
+              value={`https://trviaco.firebaseapp.com/game/answers/${id}`}
             ></QRCode>
           )}
           <div className="player">
@@ -95,7 +95,7 @@ export default function CreateGame() {
         <Col className="right-container" md={8}>
           <h1>Game Settings</h1>
           <Settings />
-          {`localhost:3000/game/answers/${id}`}
+          {/* {`localhost:3000/game/answers/${id}`} */}
         </Col>
       </Row>
     </Container>

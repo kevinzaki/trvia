@@ -1,7 +1,6 @@
 import React from "react";
 import { currentQuestion } from "./questionsSlice";
 import { useSelector } from "react-redux";
-import { Card } from "react-bootstrap";
 import "./question.css";
 
 export default function SingleQuestion() {

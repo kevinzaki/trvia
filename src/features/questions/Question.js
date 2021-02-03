@@ -7,7 +7,6 @@ import {
   incrementQuestion,
   setScores,
   setQuestionCount,
-  setIsGameOver,
   setIsRoundOver
 } from "../game/gameSlice";
 import {
@@ -18,14 +17,12 @@ import {
 } from "./questionsSlice";
 import { useParams, useHistory } from "react-router-dom";
 import { socket } from "../../api/socket";
-import { Container, Button, Navbar } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import Scores from "../scores/Scores";
-import { Link } from "react-router-dom";
 import SingleQuestion from "./SingleQuestion";
 import CorrectAnswer from "./CorrectAnswer";
 import ActionButton from "./ActionButton";
 import "./question.css";
-import StickyFooter from "./StickyFooter";
 import Timer from "./Timer";
 import QuestionNumber from "./QuestionNumber";
 
@@ -40,7 +37,6 @@ export default function Question() {
   const question = useSelector(currentQuestion);
 
   const [timer, setTimer] = useState(-1);
-  const [showScores, setShowScores] = useState(false);
   const [numOfQuestions, setNumOfQuestions] = useState(1);
 
   const rounds = roundSettings.length;
@@ -78,7 +74,6 @@ export default function Question() {
 
     socket.on("scores", scores => {
       dispatch(setScores(scores.scores));
-      setShowScores(true);
     });
   }, []);
 

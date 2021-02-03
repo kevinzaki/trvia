@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import { fetchGameId, gameId } from "../game/gameSlice";
+import { fetchGameId } from "../game/gameSlice";
 import { setAnswers, allAnswers } from "./questionsSlice";
 import { socket } from "../../api/socket";
-import { Form, Button, Container } from "react-bootstrap";
+import { Form, Container } from "react-bootstrap";
 import Option from "./Option";
 import "./answers.css";
 
@@ -21,7 +21,7 @@ export default function Answers() {
     if (idStatus === "idle") {
       dispatch(fetchGameId(id));
     }
-  }, [idStatus, dispatch]);
+  }, [idStatus, dispatch, id]);
 
   // useEffect(() => {
   //   if (id && name) {

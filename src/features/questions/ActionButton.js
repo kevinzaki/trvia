@@ -1,6 +1,5 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { Button } from "react-bootstrap";
 import "./question.css";
 
 export default function ActionButton({ onQuestion, onRound, onGame }) {
